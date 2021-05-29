@@ -1,40 +1,30 @@
-ExitCode = 1
+# Блок импорта  модулей(встроеных)
+import array
+# from array import*
+from random import shuffle
+from random import choice
+# from random import *
+import operator
+import tkinter as tk
+import os
+import ctypes
+from ctypes import windll
+# from ctypes import *
+import re
+
+# импорт из созданных модулей
+from GraphicWindowFuns import *
+from RandomFuns import *
+from MistakeProtectFuns import *
+from FileWorkFuns import *
+
 # Код выхода
+ExitCode = 1
+
 
 while ExitCode != "0":
-    
-    # Блок импорта  модулей
-    import array
-    # from array import*
-    from random import shuffle
-    from random import choice
-    # from random import *
-    import operator
-    import tkinter as tk
-    import os
-    import ctypes
-    from ctypes import windll
-    # from ctypes import *
-    import re
 
-    # Блок ввода из файла
-    f = open("Asks.txt", "r", encoding='utf-8')
-    Quests = ['q']*90
-    for i in range(0, 90):
-        Quests[i] = f.readline()
-        
-    f.close()
-    KeyAnswers = ['q']*90
-    k = open("Anses.txt", "r", encoding="utf-8")
-    for i in range(0, 90):
-        KeyAnswers[i] = k.readline()
-    k.close()
-
-    # Установка оптимального интерфейса
-    x = (windll.user32.GetSystemMetrics(0))//8
-    y = (windll.user32.GetSystemMetrics(1))//8
-    os.system('mode con cols=' + str(x) + ' lines=' + str(y))
-    os.system('color 2f')
+    input_from_file()
 
     class Gamer:
         """Создание класса Игрок """
@@ -46,135 +36,24 @@ while ExitCode != "0":
     # Блок функций:
 
     # Блок функций графического окна
+    make_window()
+    make_ui()
 
-
-    def write(a):
-
-        """Вывод в графическое окно """
-
-        label = tk.Label(
-            text=a,
-            font="Times 15",
-            fg="blue",
-            bg="pink",
-
-            width=240,
-
-            height=30,
-        )
-        label.pack()
-
-
-    def open_up():
-        """Открытие графического окна """
-        window = tk.Tk()  
-        window.title("Поле чудес")  
-        window.geometry('3900x2500')
-        window.configure(background='pink')
-        return window
-
-
-    def winner_congrats(a, b):
-        """Блок объявления победителя в графическом окне """
-        c = a+b
-        label = tk.Label(
-            text=c,
-            font="Times 15",
-            fg="blue",
-            bg="pink",
-            width=240,
-            height=30,
-        )
-        label.pack()
-
-    def random_drum(players_list):
-        """Формирование порядка ходов между игроками """
-        shuffle(players_list)
-        return players_list
-
-
-    def random_drum_case():
-        """Функция "барабан", определяющая событие в игре"""
-        cases = [250, 500, 750, 800]*4+[0]+[2]
-        game_case = choice(cases)
-        print(game_case, ' На барабане')
-        return game_case
-
-
-    def score_count(score, action):
-        """Функция подсчета баллов """
-        if action == 2:
-            score = score*2
-        else:
-            score = score+action
-        return score
-      
-
-    def second_chance():
-        """Функция второго шанса """
-        chance_case = [0, 0, 0, 0, 1]
-        second_chance_turn = choice(chance_case)
-        return second_chance_turn
-
-    # Блок открытия приветственного окна
-    win = open_up()
-    Btn = tk.Button(text="Начать игру!", command=win.destroy, padx="20", pady="8", fg="red", bg="yellow",)
-    
-    write("Добро пожаловать на Поле Чудес!")
-    Btn.pack()
-    win.mainloop()
-
-    # Ввод номера игры
+    # Ввод номера игры с проверкой
     print("Введите номер игры от 1 до 30!")
-    NumberOfGame = int(input())
-    
-    while NumberOfGame < 1 or NumberOfGame > 30:
-        print("Ошибка! Необходимо ввести ЧИСЛО от 1 до 30!")
-        NumberOfGame = int(input())
+    NumberOfGame = str(input())
+    if defend_game_number(NumberOfGame) == 0:
+        continue
+    NumberOfGame = int(NumberOfGame)
 
     # Блок первоначальных переменных из файла
-    Question1 = Quests[NumberOfGame*3-3]
-    
-    Answer11 = KeyAnswers[NumberOfGame*3-3]
-    Answer11 = Answer11[0:-1]
-    
-    Answer1 = []
-    for letter in Answer11:
-        Answer1.append(letter)
+    copy_data(NumberOfGame)
 
-    Answer1Hidden = ["*"]*len(Answer1)
-
-    Question2 = Quests[NumberOfGame*3-2]
-    Answer22 = KeyAnswers[NumberOfGame*3-2]
-    Answer22 = Answer22[0:-1]
-    Answer2 = []
-    for letter in Answer22:
-        Answer2.append(letter)
-       
-    Answer2Hidden = ["*"]*len(Answer2)
-        
-    Question3 = Quests[NumberOfGame*3-1]
-    Answer33 = KeyAnswers[NumberOfGame*3-1]
-    Answer3 = []
-    Answer33 = Answer33[0:-1]
-    for letter in Answer33:
-        Answer3.append(letter)
-      
-    Answer3Hidden = ["*"]*len(Answer3)
-    
-    Questions = [Question1, Question2, Question3]
-    Answers = [Answer11, Answer22, Answer33]
-    AnswersInList = [Answer1, Answer2, Answer3]
-    AnswersHidden = [Answer1Hidden, Answer2Hidden, Answer3Hidden]
-
-    # Блок ввода количества игроков
-
+    # Блок ввода количества игроков с проверкой
     print("Введите количество игроков:от 2 до 6!")
     NumberOfPlayers = str(input())
-    while NumberOfPlayers.isdigit is False or NumberOfPlayers < "2" or NumberOfPlayers > "6":
-        print("Ошибка! Необходимо ввести ЧИСЛО от 2 до 6!")
-        NumberOfPlayers = str(input())
-         
+    if defend_gamer_number(NumberOfPlayers) ==0:
+        continue
     NumberOfPlayers = int(NumberOfPlayers)
 
     # Блок ввода никнеймов игроков
@@ -189,9 +68,9 @@ while ExitCode != "0":
     for RoundNumber in range(3):
         
         flag = 0
-        SolutionInList = AnswersInList[RoundNumber]
-        Solution = Answers[RoundNumber]
-        SolutionHidden = AnswersHidden[RoundNumber]
+        SolutionInList = AnsAndQuestsClass.answers_in_list[RoundNumber]
+        Solution = AnsAndQuestsClass.answers[RoundNumber]
+        SolutionHidden = AnsAndQuestsClass.answers_hidden[RoundNumber]
         AvoidRepeat = []*len(SolutionInList)
         flag = 0
         print("Раунд ", RoundNumber+1)
@@ -203,7 +82,7 @@ while ExitCode != "0":
         print("Порядок хода:")
         for i in range(NumberOfPlayers):
             print(PlayersInfo[i].name)
-        print("Вопрос: ", Questions[RoundNumber])
+        print("Вопрос: ", AnsAndQuestsClass.questions[RoundNumber])
         print("Слово-ответ", SolutionHidden)
 
         # Угадывание буквы или слова
@@ -217,6 +96,7 @@ while ExitCode != "0":
                         PlayersInfo[i].points = 0
                     print("Ходит ", PlayersInfo[i].name)
                     guess = str(input())
+                    guess = guess.upper()
                     # Избежание повтора
                     if guess in AvoidRepeat:
                         print("Эту букву уже открыли! Ход передается другому игроку!")
